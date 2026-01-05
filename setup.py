@@ -17,8 +17,8 @@ setup(
     zip_safe=True,
     maintainer='fujitake',
     maintainer_email='hiroto180205@icloud.com',
-    description='ロボットシステム学用',
-    license='BSD-3-Clause',
+    description='東海道五十三次＿旅行パッケージ',
+    license='MIT',
     extras_require={
         'test': [
             'pytest',
