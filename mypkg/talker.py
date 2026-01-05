@@ -11,7 +11,7 @@ from geopy.distance import geodesic
 class Talker(Node):
     def __init__(self):
         super().__init__('talker')
-        self.pub = self.create_publisher(NavaSatFix, 'gnss_fix', 10)
+        self.pub = self.create_publisher(NavSatFix, 'gnss_fix', 10)
         self.create_timer(0.1, self.cb)
 
         # 宿場町リスト
@@ -88,14 +88,14 @@ class Talker(Node):
         # 次の宿場への移動計画を立てる
         self.plan_next_trip()
 
-    def plan_next_trip(self)
+    def plan_next_trip(self):
         if self.current_index >= len(self.stations) - 1:
             return None
 
-        current_name, current_latiude, current_longitude = self.stations[self.current_index]
+        current_name, current_latitude, current_longitude = self.stations[self.current_index]
         next_name, next_latitude, next_longitude = self.stations[self.current_index + 1]
 
-        position_current = (cur_latitude, cur_longitude)
+        position_current = (current_latitude, current_longitude)
         position_next = (next_latitude, next_longitude)
         distance = geodesic(position_current, position_next).meters
 
@@ -104,8 +104,8 @@ class Talker(Node):
         steps = int(distance / speed_per_step)
         self.remaining_steps = max(1, steps)
 
-        self.latitude_step = (next_latitude - cur_latitude) / self.remaining_steps
-        self.longitude_step = (next_longitude - cur_longitude) / self.remaining_steps
+        self.latitude_step = (next_latitude - current_latitude) / self.remaining_steps
+        self.longitude_step = (next_longitude - current_longitude) / self.remaining_steps
 
     def cb(self):
         msg = NavSatFix()
