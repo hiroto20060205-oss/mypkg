@@ -4,7 +4,6 @@
 
 import rclpy
 from rclpy.node import Node
-from mypkg_msgs.msg import Location
 from sensor_msgs.msg import NavSatFix
 from geopy.distance import geodesic
 
