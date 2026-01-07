@@ -79,7 +79,7 @@ class Listener(Node):
             latitude_difference = msg.latitude - target_latitude
             longitude_difference = msg.longitude - target_longitude
 
-            if abs(latitude_difference) < 0.01 and abs(longitude_difference) < 0.01 and not self.visited[i]:
+            if abs(latitude_difference) < 0.008 and abs(longitude_difference) < 0.008 and not self.visited[i]:
                 self.get_logger().info(f"{name}に到着！(ガイド: {info})")
                 self.visited[i] = True
 
