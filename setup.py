@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 import os
 from glob import glob
-package_name = 'mypkg'
+package_name = 'virtual_travel'
 
 setup(
     name=package_name,
@@ -26,8 +26,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'talker = mypkg.talker:main',
-            'listener = mypkg.listener:main',
+            'gnss_simulator = virtual_travel.gnss_simulator:main',
+            'tour_guide = virtual_travel.tour_guide:main',
         ],
     },
 )
