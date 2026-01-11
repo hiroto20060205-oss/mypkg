@@ -6,7 +6,7 @@ dir=~
 [ "$1" != "" ] && dir="$1"
 cd $dir/ros2_ws
 colcon build --packages-select virtual_travel
-source install/setup.bash
+source $dir/.bashrc
 
 CSV_PATH="install/virtual_travel/share/virtual_travel/config/location.csv"
 res=0
