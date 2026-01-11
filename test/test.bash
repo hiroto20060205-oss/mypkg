@@ -10,7 +10,6 @@ fi
 
 dir=~
 [ "$1" != "" ] && dir="$1"
-
 cd $dir/ros2_ws
 colcon build --packages-select virtual_travel
 source install/setup.bash
@@ -40,18 +39,30 @@ if [ $? -ne 0 ]; then
     echo "Command failed: ros2 topic echo"
     ng "$LINENO"
 fi
-
 echo "Test1 Output: $out"
 
 if ! echo "$out" | grep -q "Osaka"; then
+    ng "$LINENO"
+fi
+kill $NODE_PID
+
+cp /tmp/location.csv.bak $CSV_PATH
+
+#CSVファイルがない場合の入力
+rm $CSV_PATH
+ros2 run virtual_travel gnss_simulator > /tmp/gnss_missing.log 2>&1 &
+NODE_PID=$!
+sleep 3
+
+out=$(ros2 topic echo /nearest_location --once --field data)
+
+if ! echo "$out" | grep -q "Goal"; then
     ng "$LINENO"
 fi
 
 kill $NODE_PID
 
 cp /tmp/location.csv.bak $CSV_PATH
-
-#CSVファイルがない場合の入力
 
 if [ $res -eq 0 ]; then
     echo "ok"
