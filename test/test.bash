@@ -10,111 +10,101 @@ source $dir/.bashrc
 
 CSV_PATH="install/virtual_travel/share/virtual_travel/config/location.csv"
 res=0
-
 mkdir -p $(dirname $CSV_PATH)
-
 ng () {
     echo "Error at line $1"
     res=1
 }
-
 cp $CSV_PATH /tmp/location.csv.bak
 
 # 1.正常な入力
 echo "name,latitude,longitude" > $CSV_PATH
-echo "Tokyo,35.0,139.0" >> $CSV_PATH
-echo "Osaka,34.0,135.0" >> $CSV_PATH
-
+echo "Tokyo,35.1,139.2" >> $CSV_PATH
+echo "Osaka,34.3,135.4" >> $CSV_PATH
 ros2 run virtual_travel gnss_simulator > /tmp/gnss.log 2>&1 & NODE_PID=$!
 sleep 3
-
 out=$(ros2 topic echo /nearest_location --once --field data)
-
 if [ $? -ne 0 ]; then
     echo "Command failed: ros2 topic echo"
     ng "$LINENO"
 fi
 echo "Test1 Output: $out"
-
 if ! echo "$out" | grep -q "Osaka"; then
     ng "$LINENO"
 fi
 kill $NODE_PID
-
-cp /tmp/location.csv.bak $CSV_PATH
+pkill -f gnss_simulator
 
 # 2.CSVファイルがない場合の入力
-cp /tmp/location.csv.bak $CSV_PATH
 rm $CSV_PATH
-
 ros2 run virtual_travel gnss_simulator > /tmp/gnss_missing.log 2>&1 & NODE_PID=$!
 sleep 3
-
 out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
 echo "Test2 Result: [$out]"
-
 if ! echo "$out" | grep -q "Goal"
 then
     ng "$LINENO"
 fi
-
 kill $NODE_PID
+pkill -f gnss_simulator
 
 # 3.CSVファイルに空欄や文字がある場合の入力
-mkdir -p $(dirname $CSV_PATH)
-
 echo "name,latitude,longitude" > $CSV_PATH
 echo "Nagoya,," >> $CSV_PATH
 echo "Hakata,abc,あいう" >> $CSV_PATH
-
 ros2 run virtual_travel gnss_simulator > /tmp/gnss_invalid.log 2>&1 & NODE_PID=$!
 sleep 3
-
 out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
 echo "Test3 Result: [$out]"
-
 if ! echo "$out" | grep -q "Goal"
 then
     ng "$LINENO"
 fi
-
 kill $NODE_PID
+pkill -f gnss_simulator
 
 # 4.空のCSVファイルの状態で入力したとき
 echo "name,latitude,longitude" > $CSV_PATH
 ros2 run virtual_travel gnss_simulator > /tmp/gnss_empty.log 2>&1 &
 NODE_PID=$!
 sleep 3
-
 out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
 echo "Test4 Result: [$out]"
-
 if ! echo "$out" | grep -q "Goal"
 then
      ng "$LINENO"
 fi
-
 kill $NODE_PID
+pkill -f gnss_simulator
 
 # 5.区切り文字が違う、パラメータ間に空白がある場合の入力
 echo "name;latitude;longitude" > $CSV_PATH
-echo "name, latitude, longitude" > $CSV_PATH
-
-ros2 run virtual_travel gnss_simulator > /tmp/gnss_range.log 2>&1 & NODE_PID=$!
+echo "Kyoto, latitude, longitude" >> $CSV_PATH
+ros2 run virtual_travel gnss_simulator > /tmp/gnss_delimiter.log 2>&1 & NODE_PID=$!
 sleep 3
-
 out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
 echo "Test5 Result: [$out]"
-
 if ! echo "$out" | grep -q "Goal"
 then
     ng "$LINENO"
 fi
-
 kill $NODE_PID
+pkill -f gnss_simulator
 
-
-
+# 6.緯度・経度が異常値だった場合の入力
+echo "name,latitude,longitude" > $CSV_PATH
+echo "Hiroshima,100,200" >> $CSV_PATH
+echo "Chiba,-100,-200" >> $CSV_PATH
+ros2 run virtual_travel gnss_simulator > /tmp/gnss_range.log 2>&1 & NODE_PID=$!
+sleep 3
+out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
+echo "Test6 Result: [$out]"
+if ! echo "$out" | grep -q "Goal"
+then
+    ng "$LINENO"
+fi
+kill $NODE_PID
+pkill -f gnss_simulator
 
 cp /tmp/location.csv.bak $CSV_PATH
 
