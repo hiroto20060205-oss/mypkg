@@ -11,6 +11,8 @@ source $dir/.bashrc
 CSV_PATH="install/virtual_travel/share/virtual_travel/config/location.csv"
 res=0
 
+mkdir -p $(dirname $CSV_PATH)
+
 ng () {
     echo "Error at line $1"
     res=1
@@ -42,13 +44,34 @@ kill $NODE_PID
 
 cp /tmp/location.csv.bak $CSV_PATH
 
-#CSVファイルがない場合の入力
+# CSVファイルがない場合の入力
+cp /tmp/location.csv.bak $CSV_PATH
 rm $CSV_PATH
+
 ros2 run virtual_travel gnss_simulator > /tmp/gnss_missing.log 2>&1 &
 NODE_PID=$!
 sleep 3
 
-out=$(ros2 topic echo /nearest_location --once --field data)
+out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
+
+if ! echo "$out" | grep -q "Goal"; then
+    ng "$LINENO"
+fi
+
+kill $NODE_PID
+
+# CSVファイルに空欄や文字がある場合の入力
+mkdir -p $(dirname $CSV_PATH)
+
+echo "name,latitude,longitude" > $CSV_PATH
+echo "Nagoya,," >> $CSV_PATH
+echo "Hakata,abc,あいう" >> $CSV_PATH
+
+ros2 run virtual_travel gnss_simulator > /tmp/gnss_invalid.log 2>&1 &
+NODE_PID=$!
+sleep 3
+
+out=$(timeout 10 ros2 topic echo /nearest_location --once --field data)
 
 if ! echo "$out" | grep -q "Goal"; then
     ng "$LINENO"
