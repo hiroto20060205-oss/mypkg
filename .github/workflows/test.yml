@@ -14,4 +14,5 @@ jobs:
            mkdir -p /root/ros2_ws/src/virtual_travel
            cp -r ./* /root/ros2_ws/src/virtual_travel/
            cd /root/ros2_ws
+           source /opt/ros/humble/setup.bash
            bash -xv ./src/virtual_travel/test/test.bash /root
