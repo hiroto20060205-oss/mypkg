@@ -7,6 +7,7 @@ jobs:
     steps:
        - uses: actions/checkout@v3
        - name: build and test
+         shell: bash
          run: |
            apt-get update
            apt-get install -y python3-geopy
@@ -14,5 +15,5 @@ jobs:
            mkdir -p /root/ros2_ws/src/virtual_travel
            cp -r ./* /root/ros2_ws/src/virtual_travel/
            cd /root/ros2_ws
-           . /opt/ros/humble/setup.bash
+           source /opt/ros/humble/setup.bash
            bash -xv ./src/virtual_travel/test/test.bash /root
