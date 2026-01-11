@@ -2,6 +2,12 @@
 # SPDX-FileCopyrightText: 2025 Hiroto Fujitake
 # SPDX-License-Identifier: MIT
 
+if [ -f /opt/ros/humble/setup.bash ]; then
+    source /opt/ros/humble/setup.bash
+elif [ -f /opt/ros/jazzy/setup.bash ]; then
+    source /opt/ros/jazzy/setup.bash
+fi
+
 dir=~
 [ "$1" != "" ] && dir="$1"
 
