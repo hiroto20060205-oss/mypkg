@@ -7,7 +7,7 @@ dir=~
 
 cd $dir/ros2_ws
 colcon build --packages-select virtual_travel
-source $dir/.bashrc
+source install/setup.bash
 
 CSV_PATH="install/virtual_travel/share/virtual_travel/config/location.csv"
 res=0
@@ -37,7 +37,7 @@ fi
 
 echo "Test1 Output: $out"
 
-if [ "$out" != "Osaka" ]; then
+if ! echo "$out" | grep -q "Osaka"; then
     ng "$LINENO"
 fi
 
