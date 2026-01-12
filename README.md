@@ -3,6 +3,7 @@
 
 ## 概要
 本リポジトリの`config`ディレクトリにある[location.csv](https://github.com/hiroto20060205-oss/virtual_travel/blob/dev/config/location.csv)の地名、緯度、経度を読み込んで、現在地と目的地までの距離を算出するパッケージです。
+
 次の地点まで一定の速度で進行し、その間の座標、距離、地名をトピックとしてPublishします。(別ターミナルで`ros2 topic echo /トピック名`といったコマンドを入力する必要があります)
 
 ## ノード
